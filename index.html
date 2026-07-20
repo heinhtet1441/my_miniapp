@@ -1,72 +1,177 @@
 <!DOCTYPE html>
-<html lang="my">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multi-Service Mini App</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        body { font-family: Arial, sans-serif; background-color: #121212; color: #ffffff; margin: 0; padding: 15px; }
-        .tab-buttons { display: flex; justify-content: space-around; background: #1e1e1e; padding: 8px; border-radius: 10px; margin-bottom: 15px; }
-        .tab-btn { background: none; border: none; color: #888; font-weight: bold; font-size: 13px; cursor: pointer; padding: 8px; }
-        .tab-btn.active { color: #f7a600; border-bottom: 2px solid #f7a600; }
-        .tab-content { display: none; background: #1e1e1e; padding: 15px; border-radius: 10px; }
-        .tab-content.active { display: block; }
-        input { width: 100%; padding: 10px; margin: 8px 0; border-radius: 5px; border: 1px solid #333; background: #2a2a2a; color: white; box-sizing: border-box; }
-        .btn { width: 100%; background: #f7a600; color: black; font-weight: bold; padding: 12px; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; }
-        .card { background: #2a2a2a; padding: 10px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Telegram Mini App</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #121824;
+      color: #ffffff;
+      margin: 0;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .card {
+      background: #1e2738;
+      width: 100%;
+      max-width: 400px;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      box-sizing: border-box;
+      display: none; /* Default hidden */
+    }
+    .active { display: block; }
+    h2 { color: #f3a833; margin-top: 0; text-align: center; }
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border-radius: 8px;
+      border: 1px solid #334155;
+      background: #0f172a;
+      color: white;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    button {
+      background: #f3a833;
+      color: #000;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+    }
+    .rate-list { list-style: none; padding: 0; }
+    .rate-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px;
+      background: #0f172a;
+      margin-bottom: 8px;
+      border-radius: 6px;
+    }
+    /* Mini Game Styles */
+    #game-box {
+      width: 100%;
+      height: 250px;
+      background: #0f172a;
+      border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+    #gold-coin {
+      width: 40px;
+      height: 40px;
+      background: gold;
+      border-radius: 50%;
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: black;
+      cursor: pointer;
+      user-select: none;
+      box-shadow: 0 0 10px gold;
+    }
+  </style>
 </head>
 <body>
 
-    <!-- Tab Menu -->
-    <div class="tab-buttons">
-        <button class="tab-btn active" onclick="switchTab('mint')">🔄 Mint Ex</button>
-        <button class="tab-btn" onclick="switchTab('forex')">🌐 ငွေလဲနှုန်း</button>
-        <button class="tab-btn" onclick="switchTab('gold')">🥇 ရွှေဈေး</button>
+  <!-- 1. MINT EXCHANGE APP -->
+  <div id="exchange" class="card">
+    <h2>🔄 Mint Exchange</h2>
+    <p style="text-align:center; color:#94a3b8;">Thai Baht (THB) to Myanmar Kyat (MMK)</p>
+    <label>THB ပမာဏ ထည့်ပါ:</label>
+    <input type="number" id="thbAmount" placeholder="e.g. 1000" oninput="convertCurrency()">
+    
+    <label>ရရှိမည့် MMK ပမာဏ (Rate: 1 THB = 125 MMK):</label>
+    <input type="text" id="mmkResult" readonly placeholder="0 MMK">
+    <button onclick="alert('Exchange Request Sent!')">Exchange Now</button>
+  </div>
+
+  <!-- 2. FOREX RATES APP -->
+  <div id="forex" class="card">
+    <h2>🌐 Forex Rates Today</h2>
+    <ul class="rate-list">
+      <li class="rate-item"><span>🇺🇸 USD / MMK</span> <strong>4,500 MMK</strong></li>
+      <li class="rate-item"><span>🇹🇭 THB / MMK</span> <strong>125 MMK</strong></li>
+      <li class="rate-item"><span>🇸🇬 SGD / MMK</span> <strong>3,300 MMK</strong></li>
+      <li class="rate-item"><span>🇪🇺 EUR / MMK</span> <strong>4,850 MMK</strong></li>
+    </ul>
+  </div>
+
+  <!-- 3. GOLD PRICE APP -->
+  <div id="gold" class="card">
+    <h2>🥇 Live Gold Prices</h2>
+    <div class="rate-item">
+      <span>Academy Gold (၁ ပဲရည်)</span>
+      <strong style="color: gold;">5,200,000 MMK</strong>
     </div>
-
-    <!-- 1. Mint Exchange -->
-    <div id="mint" class="tab-content active">
-        <h3>THB ➡️ MMK Exchange</h3>
-        <input type="number" id="thbAmount" placeholder="ထိုင်းဘတ် ပမာဏ ရိုက်ပါ" oninput="calculateExchange()">
-        <p>ပေါက်ဈေး (1 THB): <b>135 MMK</b></p>
-        <h4>ရရှိမည့်ကျပ်: <span id="mmkResult" style="color: #00ff66;">0</span> MMK</h4>
-        <button class="btn" onclick="sendOrder()">အော်ဒါတင်မည်</button>
+    <div class="rate-item">
+      <span>15 ပဲရည်</span>
+      <strong style="color: gold;">4,880,000 MMK</strong>
     </div>
-
-    <!-- 2. Forex -->
-    <div id="forex" class="tab-content">
-        <h3>နိုင်ငံတကာ ငွေပေါက်ဈေး</h3>
-        <div class="card"><span>🇺🇸 USD / MMK</span> <b>4,200 Kyat</b></div>
-        <div class="card"><span>🇹🇭 THB / MMK</span> <b>135 Kyat</b></div>
+    <div class="rate-item">
+      <span>World Gold (1 Oz)</span>
+      <strong>$2,400 USD</strong>
     </div>
+  </div>
 
-    <!-- 3. Gold -->
-    <div id="gold" class="tab-content">
-        <h3>ရွှေဈေးနှုန်းများ</h3>
-        <div class="card"><span>🇲🇲 အခေါက်ရွှေ (၁ ပဲရည်)</span> <b>5,800,000 Kyat</b></div>
+  <!-- 4. MINI GAME APP -->
+  <div id="game" class="card">
+    <h2>🎮 Catch The Gold Coin!</h2>
+    <p style="text-align:center;">ရွှေဒင်္ဂါးလေးကို မြန်မြန်နှိပ်ပြီး Score ယူပါ!</p>
+    <p style="text-align:center; font-size:18px;">Score: <span id="score" style="color:gold;">0</span></p>
+    <div id="game-box">
+      <div id="gold-coin" onclick="catchCoin()">🪙</div>
     </div>
+  </div>
 
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
+  <script>
+    Telegram.WebApp.ready();
 
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            event.currentTarget.classList.add('active');
-        }
+    // URL မှာပါတဲ့ Parameter အလိုက် Page သီးသန့်ပြပေးခြင်း
+    const urlParams = new URLSearchParams(window.location.search);
+    const page = urlParams.get('page') || 'exchange';
 
-        function calculateExchange() {
-            const thb = document.getElementById('thbAmount').value;
-            document.getElementById('mmkResult').innerText = (thb * 135).toLocaleString();
-        }
+    document.querySelectorAll('.card').forEach(el => el.classList.remove('active'));
+    if (document.getElementById(page)) {
+      document.getElementById(page).classList.add('active');
+    } else {
+      document.getElementById('exchange').classList.add('active');
+    }
 
-        function sendOrder() {
-            tg.showAlert("သင့်အော်ဒါကို လက်ခံရရှိပါသည်။");
-        }
-    </script>
+    // Exchange Calculator
+    function convertCurrency() {
+      const thb = document.getElementById('thbAmount').value;
+      const rate = 125; // ဥပမာ Exchange Rate
+      document.getElementById('mmkResult').value = (thb * rate).toLocaleString() + " MMK";
+    }
+
+    // Mini Game Logic
+    let score = 0;
+    function catchCoin() {
+      score++;
+      document.getElementById('score').innerText = score;
+      
+      const box = document.getElementById('game-box');
+      const maxX = box.clientWidth - 40;
+      const maxY = box.clientHeight - 40;
+      
+      const randomX = Math.floor(Math.random() * maxX);
+      const randomY = Math.floor(Math.random() * maxY);
+      
+      const coin = document.getElementById('gold-coin');
+      coin.style.left = randomX + 'px';
+      coin.style.top = randomY + 'px';
+    }
+  </script>
 </body>
 </html>
