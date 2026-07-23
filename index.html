@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Enterprise Mini App</title>
-    <!-- Telegram WebApp SDK & Chart.js -->
+    <!-- Telegram SDK & Chart.js -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -98,7 +98,6 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* Bottom Nav Bar */
         .bottom-nav {
             position: fixed;
             bottom: 0; left: 0; right: 0;
@@ -122,11 +121,10 @@
         .nav-item.active { color: var(--gold); font-weight: bold; }
         .nav-icon { font-size: 18px; margin-bottom: 2px; }
 
-        .chart-container {
+        .chart-box {
             position: relative;
             width: 100%;
-            height: 200px;
-            margin-top: 10px;
+            height: 180px;
         }
     </style>
 </head>
@@ -141,7 +139,7 @@
         <div class="badge">👑 VIP LEVEL 1</div>
     </div>
 
-    <!-- TAB 1: FINANCE / MAIN DASHBOARD -->
+    <!-- TAB 1: FINANCE -->
     <div id="page-finance" class="tab-content active">
         <div class="card">
             <div class="card-title">
@@ -162,13 +160,13 @@
             </div>
         </div>
 
-        <!-- LIVE CHART SECTION -->
+        <!-- LIVE CHART -->
         <div class="card">
             <div class="card-title">
-                <span>📈 Market Analytics</span>
-                <span style="font-size: 10px; color: var(--accent);">Live Graph</span>
+                <span>📈 USD/MMK Analytics</span>
+                <span style="font-size: 10px; color: var(--accent);">24h Trend</span>
             </div>
-            <div class="chart-container">
+            <div class="chart-box">
                 <canvas id="liveChart"></canvas>
             </div>
         </div>
@@ -186,8 +184,8 @@
     <div id="page-game" class="tab-content">
         <div class="card" style="text-align: center;">
             <div class="card-title">🎮 Billionaire Empire Tap</div>
-            <div style="font-size: 32px; font-weight: bold; color: var(--gold); margin: 12px 0;" id="score">0</div>
-            <button class="btn btn-success" onclick="playGame()">TAP TO EARN MONEY 🪙</button>
+            <div style="font-size: 36px; font-weight: bold; color: var(--gold); margin: 16px 0;" id="score">0</div>
+            <button class="btn btn-success" style="padding: 16px; font-size: 16px;" onclick="playGame()">TAP TO EARN MONEY 🪙</button>
         </div>
     </div>
 
@@ -215,35 +213,100 @@
     </div>
 
     <script>
-       const tg = window.Telegram.WebApp;
-tg.expand();
+        const tg = window.Telegram.WebApp;
+        tg.expand();
 
-// Load User Info
-if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-    document.getElementById('user-name').innerText = tg.initDataUnsafe.user.first_name || "User";
-}
+        // Safe User Name Load
+        try {
+            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                document.getElementById('user-name').innerText = tg.initDataUnsafe.user.first_name || "User";
+            }
+        } catch(e) {}
 
-// Telegram Native Deep Link Parameter (`startapp` သို့မဟုတ် URL Param) ဖတ်ခြင်း
-const urlParams = new URLSearchParams(window.location.search);
-const startParam = tg.initDataUnsafe?.start_param || urlParams.get('tgWebAppStartParam') || urlParams.get('startapp');
+        // Page Switcher
+        function switchPage(pageId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            
+            const targetPage = document.getElementById('page-' + pageId);
+            const targetNav = document.getElementById('nav-' + pageId);
 
-// Parameter အလိုက် စာမျက်နှာ တိုက်ရိုက် ပွင့်စေခြင်း
-if (startParam && ['finance', 'game', 'wallet'].includes(startParam)) {
-    switchPage(startParam);
-}
+            if (targetPage) targetPage.classList.add('active');
+            if (targetNav) targetNav.classList.add('active');
+            
+            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+        }
 
-function switchPage(pageId) {
-    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-    
-    const targetPage = document.getElementById('page-' + pageId);
-    const targetNav = document.getElementById('nav-' + pageId);
+        // Deep Link Handling
+        try {
+            const urlParams = new URLSearchParams(window.location.search);
+            const startParam = tg.initDataUnsafe?.start_param || urlParams.get('startapp') || window.location.hash.replace('#', '');
+            if (startParam && ['finance', 'game', 'wallet'].includes(startParam)) {
+                switchPage(startParam);
+            }
+        } catch(e) {}
 
-    if (targetPage) targetPage.classList.add('active');
-    if (targetNav) targetNav.classList.add('active');
-    
-    if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
-}
+        // Tap Game Logic
+        let score = 0;
+        function playGame() {
+            score++;
+            document.getElementById('score').innerText = score;
+            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+        }
+
+        // Action Handlers
+        function openChannel() { tg.openTelegramLink("https://t.me/telegram"); }
+
+        function openQRScanner() {
+            if (tg.showScanQrPopup) {
+                tg.showScanQrPopup({ text: "Scan QR Code" }, function(text) {
+                    tg.showAlert("Scanned Data: " + text);
+                    return true;
+                });
+            } else {
+                tg.showAlert("QR Scanner is supported on Telegram Mobile App!");
+            }
+        }
+
+        function triggerInvoice() {
+            tg.showAlert("Telegram Invoice triggered! Integration ready.");
+            if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+        }
+
+        function triggerHaptic() {
+            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('heavy');
+        }
+
+        // Render ChartSafely
+        window.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('liveChart');
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['10am', '12pm', '2pm', '4pm', '6pm'],
+                        datasets: [{
+                            label: 'USD/MMK',
+                            data: [4480, 4500, 4510, 4505, 4520],
+                            borderColor: '#38bdf8',
+                            backgroundColor: 'rgba(56, 189, 248, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { ticks: { color: '#94a3b8' }, grid: { display: false } },
+                            y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+                        }
+                    }
+                });
+            }
+        });
     </script>
 </body>
 </html>
