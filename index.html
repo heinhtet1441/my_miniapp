@@ -3,102 +3,218 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Telegram Mini App Demo</title>
-  <!-- Telegram Web App SDK -->
+  <title>Billionaire Financial Platform</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #eab308;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+    }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      background-color: var(--tg-theme-bg-color, #f4f4f5);
-      color: var(--tg-theme-text-color, #222);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
       margin: 0;
-      padding: 15px;
+      padding: 12px;
+      padding-bottom: 70px;
     }
     .card {
-      background: var(--tg-theme-secondary-bg-color, #ffffff);
-      padding: 15px;
-      border-radius: 12px;
-      margin-bottom: 15px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      background: var(--card);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 12px;
+      border: 1px solid #334155;
     }
-    h3 { margin-top: 0; color: #2481cc; }
-    button {
-      width: 100%;
-      background-color: var(--tg-theme-button-color, #2481cc);
-      color: var(--tg-theme-button-text-color, #ffffff);
+    .flex-between { display: flex; justify-content: space-between; align-items: center; }
+    .badge {
+      background: rgba(234, 179, 8, 0.15);
+      color: var(--accent);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .btn {
+      background: var(--accent);
+      color: #000;
       border: none;
       padding: 12px;
-      border-radius: 8px;
+      border-radius: 10px;
       font-weight: bold;
+      width: 100%;
       cursor: pointer;
-      font-size: 14px;
+      margin-top: 8px;
     }
-    button:active { opacity: 0.8; }
-    .badge {
-      background: #e1f5fe;
-      color: #0288d1;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 12px;
+    .btn:active { transform: scale(0.98); }
+    .tab-content { display: none; }
+    .active-tab { display: block; }
+    
+    /* Navigation Bar */
+    .navbar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #090d16;
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+      border-top: 1px solid #334155;
     }
+    .nav-item {
+      color: var(--muted);
+      font-size: 11px;
+      text-align: center;
+      cursor: pointer;
+    }
+    .nav-item.active { color: var(--accent); font-weight: bold; }
+    .nav-icon { font-size: 18px; display: block; margin-bottom: 2px; }
   </style>
 </head>
 <body>
 
-  <!-- 1. Telegram User Profile -->
-  <div class="card">
-    <h3>👤 User Profile Integration</h3>
-    <p>Logged in as: <b id="user-name">Loading...</b></p>
-    <p>User ID: <span class="badge" id="user-id">---</span></p>
+  <!-- HEADER: USER & VIP STATUS -->
+  <div class="card flex-between">
+    <div>
+      <div style="font-size: 12px; color: var(--muted);">WELCOME BACK</div>
+      <div style="font-weight: bold; font-size: 16px;" id="username">Loading...</div>
+    </div>
+    <div class="badge">👑 VIP LEVEL 1</div>
   </div>
 
-  <!-- 2. Interactive Feature (Tap Game) -->
-  <div class="card">
-    <h3>🎮 Interactive Logic (Tap Game)</h3>
-    <p>Total Score: <b id="score" style="font-size: 20px; color: #4caf50;">0</b></p>
-    <button onclick="tapButton()">TAP TO EARN (+1) 🚀</button>
+  <!-- TAB 1: FINANCIAL DASHBOARD -->
+  <div id="tab-finance" class="tab-content active-tab">
+    <div class="card">
+      <div class="flex-between">
+        <h3>📊 Real-Time Market</h3>
+        <span style="font-size: 10px; color: #4ade80;">● Live Rates</span>
+      </div>
+      <div class="flex-between" style="margin: 10px 0; padding: 8px 0; border-bottom: 1px solid #334155;">
+        <span>🇺🇸 USD / MMK</span>
+        <b style="color: #4ade80;">4,520 MMK</b>
+      </div>
+      <div class="flex-between" style="margin: 10px 0; padding: 8px 0; border-bottom: 1px solid #334155;">
+        <span>🇹🇭 THB / MMK</span>
+        <b style="color: #4ade80;">132.5 MMK</b>
+      </div>
+      <div class="flex-between" style="margin: 10px 0;">
+        <span>🥇 Gold Rate (1 Tical)</span>
+        <b style="color: var(--accent);">5,450,000 MMK</b>
+      </div>
+    </div>
+
+    <!-- Official Channel Link Banner -->
+    <div class="card" style="background: linear-gradient(135deg, #1e293b, #0f172a); border: 1px solid var(--accent);">
+      <h4>📢 Official Channel</h4>
+      <p style="font-size: 12px; color: var(--muted);">နေ့စဉ် ဈေးနှုန်းသတင်းများ သီးသန့်ကြည့်ရှုရန် Join ပါ။</p>
+      <button class="btn" onclick="openChannel()">JOIN TELEGRAM CHANNEL 🚀</button>
+    </div>
   </div>
 
-  <!-- 3. Dynamic Navigation / Pages -->
-  <div class="card">
-    <h3>🌐 Navigation & Modules</h3>
-    <p id="page-status">Current View: Home</p>
-    <button onclick="switchTab('Exchange Market')">Go to Exchange</button><br><br>
-    <button onclick="switchTab('Gold Rates')">Go to Gold Rates</button>
+  <!-- TAB 2: BILLIONAIRE TAP GAME -->
+  <div id="tab-game" class="tab-content">
+    <div class="card" style="text-align: center;">
+      <h3>💼 Billionaire Empire</h3>
+      <p style="font-size: 12px; color: var(--muted);">Business သမားတစ်ယောက်လို Tap လုပ်ပြီး Asset တွေ စုဆောင်းပါ</p>
+      <div style="font-size: 32px; font-weight: bold; color: var(--accent); margin: 15px 0;" id="networth">$0</div>
+      <button class="btn" style="padding: 20px; font-size: 18px;" onclick="tapEmpire()">Tap To Earn Money 💰</button>
+    </div>
+    <div class="card">
+      <h4>🏢 Buy Businesses</h4>
+      <div class="flex-between" style="margin-top: 8px;">
+        <div>
+          <b>Coffee Shop</b>
+          <div style="font-size: 10px; color: var(--muted);">$100 Cost | +$1/tap</div>
+        </div>
+        <button class="btn" style="width: auto; padding: 6px 12px;" onclick="buyBusiness(100, 1)">Buy</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: WALLET & VIP PORTAL -->
+  <div id="tab-wallet" class="tab-content">
+    <div class="card">
+      <div class="flex-between">
+        <h3>💳 Telegram Wallet</h3>
+        <span class="badge">SECURE</span>
+      </div>
+      <p style="font-size: 12px; color: var(--muted);">Main Balance</p>
+      <h2 style="margin: 0; color: #4ade80;">$ 1,250.00 USD</h2>
+      <div style="display: flex; gap: 10px; margin-top: 15px;">
+        <button class="btn" onclick="tgAlert('Deposit address copied!')">Deposit</button>
+        <button class="btn" style="background: #334155; color: white;" onclick="tgAlert('Withdraw Feature Pending')">Withdraw</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAVIGATION BOTTOM BAR -->
+  <div class="navbar">
+    <div class="nav-item active" onclick="switchNav('finance', this)">
+      <span class="nav-icon">📈</span>
+      <span>Finance</span>
+    </div>
+    <div class="nav-item" onclick="switchNav('game', this)">
+      <span class="nav-icon">🎮</span>
+      <span>Billion Game</span>
+    </div>
+    <div class="nav-item" onclick="switchNav('wallet', this)">
+      <span class="nav-icon">💳</span>
+      <span>Wallet/VIP</span>
+    </div>
   </div>
 
   <script>
-    // Initialize Telegram Web App SDK
     const tg = window.Telegram.WebApp;
-    tg.expand(); // Make WebApp full height
+    tg.expand();
 
-    // Display User Data from Telegram Context
+    // User Setup
     if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-      const user = tg.initDataUnsafe.user;
-      document.getElementById('user-name').innerText = `${user.first_name} ${user.last_name || ''}`;
-      document.getElementById('user-id').innerText = user.id;
+      document.getElementById('username').innerText = tg.initDataUnsafe.user.first_name;
     } else {
-      document.getElementById('user-name').innerText = "Guest (Browser Mode)";
+      document.getElementById('username').innerText = "Developer User";
     }
 
-    // Tap Game Logic with Haptic Feedback
-    let score = 0;
-    function tapButton() {
-      score++;
-      document.getElementById('score').innerText = score;
-      
-      // Trigger Haptic Feedback on Phone
-      if (tg.HapticFeedback) {
-        tg.HapticFeedback.impactOccurred('medium');
+    // Navigation Switcher
+    function switchNav(tabId, el) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active-tab'));
+      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+      document.getElementById('tab-' + tabId).classList.add('active-tab');
+      el.classList.add('active');
+      if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+    }
+
+    // Game Logic
+    let money = 0;
+    let power = 1;
+
+    function tapEmpire() {
+      money += power;
+      document.getElementById('networth').innerText = '$' + money.toLocaleString();
+      if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+    }
+
+    function buyBusiness(cost, addPower) {
+      if (money >= cost) {
+        money -= cost;
+        power += addPower;
+        document.getElementById('networth').innerText = '$' + money.toLocaleString();
+        tgAlert('Upgrade Successful!');
+      } else {
+        tgAlert('Not enough money!');
       }
     }
 
-    // Tab Switching Logic
-    function switchTab(tabName) {
-      document.getElementById('page-status').innerText = "Current View: " + tabName;
-      if (tg.HapticFeedback) {
-        tg.HapticFeedback.notificationOccurred('success');
-      }
+    function openChannel() {
+      // သင့် Telegram Channel Link သို့ ပို့ပေးရန်
+      tg.openTelegramLink('https://t.me/telegram'); 
+    }
+
+    function tgAlert(msg) {
+      if (tg.showAlert) tg.showAlert(msg);
+      else alert(msg);
     }
   </script>
 </body>
