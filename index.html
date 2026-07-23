@@ -274,7 +274,7 @@
             if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
         }
 
-        // Handle Direct Link Routing
+        // Handle Direct Link Routing (startapp)
         try {
             const urlParams = new URLSearchParams(window.location.search);
             const startParam = tg.initDataUnsafe?.start_param || urlParams.get('startapp');
