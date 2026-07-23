@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Enterprise Mini App</title>
-    <!-- Telegram WebApp SDK -->
+    <!-- Telegram WebApp SDK & Chart.js -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -121,11 +121,18 @@
 
         .nav-item.active { color: var(--gold); font-weight: bold; }
         .nav-icon { font-size: 18px; margin-bottom: 2px; }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
 
-    <!-- Header Section (Always Visible) -->
+    <!-- Header Section -->
     <div class="header-card">
         <div>
             <div style="font-size: 10px; color: var(--text-muted);">WELCOME BACK</div>
@@ -134,7 +141,7 @@
         <div class="badge">👑 VIP LEVEL 1</div>
     </div>
 
-    <!-- TAB 1: FINANCE / MAIN DASHBOARD (Open App နှိပ်ရင် တန်းပေါ်မည့် စာမျက်နှာ) -->
+    <!-- TAB 1: FINANCE / MAIN DASHBOARD -->
     <div id="page-finance" class="tab-content active">
         <div class="card">
             <div class="card-title">
@@ -152,6 +159,17 @@
             <div class="rate-row">
                 <span>Gold Rate (1 Tical)</span>
                 <span class="rate-value" style="color: var(--gold);">5,450,000 MMK</span>
+            </div>
+        </div>
+
+        <!-- LIVE CHART SECTION -->
+        <div class="card">
+            <div class="card-title">
+                <span>📈 Market Analytics</span>
+                <span style="font-size: 10px; color: var(--accent);">Live Graph</span>
+            </div>
+            <div class="chart-container">
+                <canvas id="liveChart"></canvas>
             </div>
         </div>
 
@@ -205,13 +223,12 @@
             document.getElementById('user-name').innerText = tg.initDataUnsafe.user.first_name || "User";
         }
 
-        // Deep Link Handling (URL Parameter ဖြင့် တိုက်ရိုက် သွားစေခြင်း)
+        // Handle Deep Linking (#hash)
         const hash = window.location.hash.replace('#', '');
         if (hash && ['finance', 'game', 'wallet'].includes(hash)) {
             switchPage(hash);
         }
 
-        // Switch Page Function
         function switchPage(pageId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -230,18 +247,73 @@
             if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
         }
 
-        // Actions
+        // Official Channel
         function openChannel() { tg.openTelegramLink("https://t.me/telegram"); }
+
+        // Native QR Code Scanner
         function openQRScanner() {
             if (tg.showScanQrPopup) {
                 tg.showScanQrPopup({ text: "Scan QR Code" }, function(text) {
                     tg.showAlert("Scanned: " + text);
                     return true;
                 });
-            } else { alert("QR Scanner works on Mobile Telegram App!"); }
+            } else { 
+                alert("QR Scanner works on Mobile Telegram App!"); 
+            }
         }
-        function triggerInvoice() { tg.showAlert("Invoice popup triggered!"); }
+
+        // Actual Telegram Invoice Execution (Calls native WebApp checkout)
+        function triggerInvoice() {
+            // Live Invoice Link handling
+            // တကယ့် Link ဖန်တီးရာတွင် Backend မရှိသေးချိန် တရားဝင် Native Interface Call လုပ်နည်း:
+            if (tg.openInvoice) {
+                // Example Invoice Link format from BotFather / Payment Provider
+                const sampleInvoiceUrl = "https://t.me/$INVOICE_SLUG"; 
+                tg.openInvoice(sampleInvoiceUrl, function(status) {
+                    if (status === 'paid') {
+                        tg.showAlert("Payment Successful! Stars Deposited.");
+                    } else if (status === 'cancelled') {
+                        tg.showAlert("Payment Cancelled.");
+                    } else {
+                        tg.showAlert("Invoice Status: " + status);
+                    }
+                });
+            } else {
+                tg.showAlert("Payments are only supported on official Telegram Clients!");
+            }
+            if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+        }
+
         function triggerHaptic() { if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('heavy'); }
+
+        // Live Chart Initialization
+        const ctx = document.getElementById('liveChart').getContext('2d');
+        const liveChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00'],
+                datasets: [{
+                    label: 'USD / MMK',
+                    data: [4480, 4495, 4510, 4505, 4515, 4520, 4520],
+                    borderColor: '#38bdf8',
+                    backgroundColor: 'rgba(56, 189, 248, 0.1)',
+                    fill: true,
+                    tension: 0.3,
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8' } },
+                    y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8' } }
+                }
+            }
+        });
     </script>
 </body>
 </html>
