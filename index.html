@@ -15,24 +15,35 @@
             --text: #f8fafc;
             --text-muted: #94a3b8;
             --success: #22c55e;
+            --gold: #eab308;
         }
 
         body {
             margin: 0;
-            padding: 0;
+            padding: 16px;
+            padding-bottom: 80px;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-color);
             color: var(--text);
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
         }
 
-        .container {
-            flex: 1;
+        .header-card {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            border-radius: 12px;
             padding: 16px;
-            overflow-y: auto;
-            padding-bottom: 80px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .badge {
+            background-color: rgba(234, 179, 8, 0.2);
+            color: var(--gold);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
         }
 
         .card {
@@ -43,6 +54,27 @@
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
+        .card-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .rate-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .rate-value {
+            font-weight: bold;
+            color: var(--success);
+        }
+
         .btn {
             width: 100%;
             background-color: var(--accent);
@@ -51,7 +83,7 @@
             padding: 12px;
             border-radius: 8px;
             font-weight: bold;
-            font-size: 15px;
+            font-size: 14px;
             cursor: pointer;
             margin-top: 8px;
             display: flex;
@@ -61,137 +93,155 @@
         }
 
         .btn-success { background-color: var(--success); color: #fff; }
+        .btn-gold { background-color: var(--gold); color: #000; }
 
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* Bottom Nav */
+        /* Bottom Nav Bar */
         .bottom-nav {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background-color: var(--card-bg);
+            bottom: 0; left: 0; right: 0;
+            background-color: #0b0f19;
             display: flex;
             justify-content: space-around;
             padding: 12px 0;
             border-top: 1px solid rgba(255,255,255,0.1);
+            z-index: 1000;
         }
 
         .nav-item {
             color: var(--text-muted);
-            text-decoration: none;
-            font-size: 12px;
+            font-size: 11px;
             display: flex;
             flex-direction: column;
             align-items: center;
             cursor: pointer;
         }
 
-        .nav-item.active { color: var(--accent); }
+        .nav-item.active { color: var(--gold); font-weight: bold; }
+        .nav-icon { font-size: 18px; margin-bottom: 2px; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <!-- Tab 1: Finance -->
-        <div id="finance-tab" class="tab-content">
-            <h2>📈 Finance Dashboard</h2>
-            <div class="card">
-                <canvas id="marketChart"></canvas>
+    <!-- Header Section (Always Visible) -->
+    <div class="header-card">
+        <div>
+            <div style="font-size: 10px; color: var(--text-muted);">WELCOME BACK</div>
+            <div style="font-size: 18px; font-weight: bold;" id="user-name">User</div>
+        </div>
+        <div class="badge">👑 VIP LEVEL 1</div>
+    </div>
+
+    <!-- TAB 1: FINANCE / MAIN DASHBOARD (Open App နှိပ်ရင် တန်းပေါ်မည့် စာမျက်နှာ) -->
+    <div id="page-finance" class="tab-content active">
+        <div class="card">
+            <div class="card-title">
+                <span>📊 Real-Time Market</span>
+                <span style="font-size: 10px; color: var(--success);">● Live Rates</span>
+            </div>
+            <div class="rate-row">
+                <span>USD / MMK</span>
+                <span class="rate-value">4,520 MMK</span>
+            </div>
+            <div class="rate-row">
+                <span>THB / MMK</span>
+                <span class="rate-value">132.5 MMK</span>
+            </div>
+            <div class="rate-row">
+                <span>Gold Rate (1 Tical)</span>
+                <span class="rate-value" style="color: var(--gold);">5,450,000 MMK</span>
             </div>
         </div>
 
-        <!-- Tab 2: Gaming -->
-        <div id="gaming-tab" class="tab-content">
-            <h2>🎮 Tap-to-Earn</h2>
-            <div class="card" style="text-align: center;">
-                <h1 id="score">0</h1>
-                <button class="btn btn-success" onclick="tapGame()">TAP HERE!</button>
-            </div>
-        </div>
-
-        <!-- Tab 3: Wallet & Utilities (Includes QR & Invoice) -->
-        <div id="wallet-tab" class="tab-content active">
-            <h2>💳 Wallet & Utilities</h2>
-            
-            <div class="card">
-                <h3>📷 Native Tools</h3>
-                <button class="btn" onclick="openQRScanner()"> Scan QR Code 📸</button>
-                <button class="btn btn-success" onclick="triggerInvoice()"> Deposit Star / Invoice 💎</button>
-            </div>
-
-            <div class="card">
-                <h3>📱 Telegram Haptics</h3>
-                <button class="btn" onclick="triggerHaptic()">Test Vibration 📳</button>
-            </div>
+        <div class="card" style="border: 1px solid var(--gold);">
+            <div class="card-title" style="color: var(--gold);">📢 Official Channel</div>
+            <p style="font-size: 12px; color: var(--text-muted); margin: 4px 0 12px 0;">
+                နေ့စဉ် ဈေးနှုန်းသတင်းများ သီးသန့်ကြည့်ရှုရန် Join ပါ။
+            </p>
+            <button class="btn btn-gold" onclick="openChannel()">JOIN TELEGRAM CHANNEL 🚀</button>
         </div>
     </div>
 
-    <!-- Navigation Bar -->
+    <!-- TAB 2: GAME -->
+    <div id="page-game" class="tab-content">
+        <div class="card" style="text-align: center;">
+            <div class="card-title">🎮 Billionaire Empire Tap</div>
+            <div style="font-size: 32px; font-weight: bold; color: var(--gold); margin: 12px 0;" id="score">0</div>
+            <button class="btn btn-success" onclick="playGame()">TAP TO EARN MONEY 🪙</button>
+        </div>
+    </div>
+
+    <!-- TAB 3: WALLET & UTILITIES -->
+    <div id="page-wallet" class="tab-content">
+        <div class="card">
+            <div class="card-title">💳 Wallet & Web3 Tools</div>
+            <button class="btn" onclick="openQRScanner()">Scan QR Code 📸</button>
+            <button class="btn btn-success" onclick="triggerInvoice()">Deposit Star / Invoice 💎</button>
+            <button class="btn" style="background-color: #334155; color: #fff;" onclick="triggerHaptic()">Test Vibration 📳</button>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
     <div class="bottom-nav">
-        <div class="nav-item" onclick="switchTab('finance-tab', this)">📈 Finance</div>
-        <div class="nav-item" onclick="switchTab('gaming-tab', this)">🎮 Gaming</div>
-        <div class="nav-item active" onclick="switchTab('wallet-tab', this)">💳 Wallet & Web3</div>
+        <div class="nav-item active" id="nav-finance" onclick="switchPage('finance')">
+            <span class="nav-icon">📊</span>Finance
+        </div>
+        <div class="nav-item" id="nav-game" onclick="switchPage('game')">
+            <span class="nav-icon">🎮</span>Billion Game
+        </div>
+        <div class="nav-item" id="nav-wallet" onclick="switchPage('wallet')">
+            <span class="nav-icon">💳</span>Wallet/VIP
+        </div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
-        tg.expand(); // Full screen
+        tg.expand();
 
-        // Switch Tabs Function
-        function switchTab(tabId, element) {
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            element.classList.add('active');
+        // Load User Info
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            document.getElementById('user-name').innerText = tg.initDataUnsafe.user.first_name || "User";
         }
 
-        // 1. QR Code Scanner Feature
+        // Deep Link Handling (URL Parameter ဖြင့် တိုက်ရိုက် သွားစေခြင်း)
+        const hash = window.location.hash.replace('#', '');
+        if (hash && ['finance', 'game', 'wallet'].includes(hash)) {
+            switchPage(hash);
+        }
+
+        // Switch Page Function
+        function switchPage(pageId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById('page-' + pageId).classList.add('active');
+            document.getElementById('nav-' + pageId).classList.add('active');
+            
+            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+        }
+
+        // Tap Game
+        let score = 0;
+        function playGame() {
+            score++;
+            document.getElementById('score').innerText = score;
+            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+        }
+
+        // Actions
+        function openChannel() { tg.openTelegramLink("https://t.me/telegram"); }
         function openQRScanner() {
             if (tg.showScanQrPopup) {
-                tg.showScanQrPopup({ text: "Scan any QR Code" }, function(text) {
-                    tg.showAlert("Scanned Content: " + text);
-                    return true; // close popup after scan
+                tg.showScanQrPopup({ text: "Scan QR Code" }, function(text) {
+                    tg.showAlert("Scanned: " + text);
+                    return true;
                 });
-            } else {
-                alert("QR Scanner is only supported on Telegram Mobile App!");
-            }
+            } else { alert("QR Scanner works on Mobile Telegram App!"); }
         }
-
-        // 2. Invoice Feature
-        function triggerInvoice() {
-            tg.showAlert("Invoice requested! (In production, this opens native checkout window)");
-            tg.HapticFeedback.notificationOccurred('success');
-        }
-
-        // 3. Haptic Feedback
-        function triggerHaptic() {
-            tg.HapticFeedback.impactOccurred('medium');
-        }
-
-        // 4. Tap Game Logic
-        let count = 0;
-        function tapGame() {
-            count++;
-            document.getElementById('score').innerText = count;
-            tg.HapticFeedback.impactOccurred('light');
-        }
-
-        // Initialize Chart.js
-        const ctx = document.getElementById('marketChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
-                datasets: [{
-                    label: 'TON Price ($)',
-                    data: [2.1, 3.5, 4.8, 5.2, 6.7],
-                    borderColor: '#38bdf8',
-                    tension: 0.4
-                }]
-            }
-        });
+        function triggerInvoice() { tg.showAlert("Invoice popup triggered!"); }
+        function triggerHaptic() { if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('heavy'); }
     </script>
 </body>
 </html>
