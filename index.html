@@ -3,174 +3,102 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Telegram Mini App</title>
+  <title>Telegram Mini App Demo</title>
+  <!-- Telegram Web App SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #121824;
-      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--tg-theme-bg-color, #f4f4f5);
+      color: var(--tg-theme-text-color, #222);
       margin: 0;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      padding: 15px;
     }
     .card {
-      background: #1e2738;
-      width: 100%;
-      max-width: 400px;
+      background: var(--tg-theme-secondary-bg-color, #ffffff);
+      padding: 15px;
       border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-      box-sizing: border-box;
-      display: none; /* Default hidden */
+      margin-bottom: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
-    .active { display: block; }
-    h2 { color: #f3a833; margin-top: 0; text-align: center; }
-    input, select, button {
-      width: 100%;
-      padding: 12px;
-      margin: 8px 0;
-      border-radius: 8px;
-      border: 1px solid #334155;
-      background: #0f172a;
-      color: white;
-      font-size: 16px;
-      box-sizing: border-box;
-    }
+    h3 { margin-top: 0; color: #2481cc; }
     button {
-      background: #f3a833;
-      color: #000;
-      font-weight: bold;
-      border: none;
-      cursor: pointer;
-    }
-    .rate-list { list-style: none; padding: 0; }
-    .rate-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 12px;
-      background: #0f172a;
-      margin-bottom: 8px;
-      border-radius: 6px;
-    }
-    /* Mini Game Styles */
-    #game-box {
       width: 100%;
-      height: 250px;
-      background: #0f172a;
+      background-color: var(--tg-theme-button-color, #2481cc);
+      color: var(--tg-theme-button-text-color, #ffffff);
+      border: none;
+      padding: 12px;
       border-radius: 8px;
-      position: relative;
-      overflow: hidden;
-      margin-top: 10px;
-    }
-    #gold-coin {
-      width: 40px;
-      height: 40px;
-      background: gold;
-      border-radius: 50%;
-      position: absolute;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       font-weight: bold;
-      color: black;
       cursor: pointer;
-      user-select: none;
-      box-shadow: 0 0 10px gold;
+      font-size: 14px;
+    }
+    button:active { opacity: 0.8; }
+    .badge {
+      background: #e1f5fe;
+      color: #0288d1;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
     }
   </style>
 </head>
 <body>
 
-  <!-- 1. MINT EXCHANGE APP -->
-  <div id="exchange" class="card">
-    <h2>🔄 Mint Exchange</h2>
-    <p style="text-align:center; color:#94a3b8;">Thai Baht (THB) to Myanmar Kyat (MMK)</p>
-    <label>THB ပမာဏ ထည့်ပါ:</label>
-    <input type="number" id="thbAmount" placeholder="e.g. 1000" oninput="convertCurrency()">
-    
-    <label>ရရှိမည့် MMK ပမာဏ (Rate: 1 THB = 125 MMK):</label>
-    <input type="text" id="mmkResult" readonly placeholder="0 MMK">
-    <button onclick="alert('Exchange Request Sent!')">Exchange Now</button>
+  <!-- 1. Telegram User Profile -->
+  <div class="card">
+    <h3>👤 User Profile Integration</h3>
+    <p>Logged in as: <b id="user-name">Loading...</b></p>
+    <p>User ID: <span class="badge" id="user-id">---</span></p>
   </div>
 
-  <!-- 2. FOREX RATES APP -->
-  <div id="forex" class="card">
-    <h2>🌐 Forex Rates Today</h2>
-    <ul class="rate-list">
-      <li class="rate-item"><span>🇺🇸 USD / MMK</span> <strong>4,500 MMK</strong></li>
-      <li class="rate-item"><span>🇹🇭 THB / MMK</span> <strong>125 MMK</strong></li>
-      <li class="rate-item"><span>🇸🇬 SGD / MMK</span> <strong>3,300 MMK</strong></li>
-      <li class="rate-item"><span>🇪🇺 EUR / MMK</span> <strong>4,850 MMK</strong></li>
-    </ul>
+  <!-- 2. Interactive Feature (Tap Game) -->
+  <div class="card">
+    <h3>🎮 Interactive Logic (Tap Game)</h3>
+    <p>Total Score: <b id="score" style="font-size: 20px; color: #4caf50;">0</b></p>
+    <button onclick="tapButton()">TAP TO EARN (+1) 🚀</button>
   </div>
 
-  <!-- 3. GOLD PRICE APP -->
-  <div id="gold" class="card">
-    <h2>🥇 Live Gold Prices</h2>
-    <div class="rate-item">
-      <span>Academy Gold (၁ ပဲရည်)</span>
-      <strong style="color: gold;">5,200,000 MMK</strong>
-    </div>
-    <div class="rate-item">
-      <span>15 ပဲရည်</span>
-      <strong style="color: gold;">4,880,000 MMK</strong>
-    </div>
-    <div class="rate-item">
-      <span>World Gold (1 Oz)</span>
-      <strong>$2,400 USD</strong>
-    </div>
-  </div>
-
-  <!-- 4. MINI GAME APP -->
-  <div id="game" class="card">
-    <h2>🎮 Catch The Gold Coin!</h2>
-    <p style="text-align:center;">ရွှေဒင်္ဂါးလေးကို မြန်မြန်နှိပ်ပြီး Score ယူပါ!</p>
-    <p style="text-align:center; font-size:18px;">Score: <span id="score" style="color:gold;">0</span></p>
-    <div id="game-box">
-      <div id="gold-coin" onclick="catchCoin()">🪙</div>
-    </div>
+  <!-- 3. Dynamic Navigation / Pages -->
+  <div class="card">
+    <h3>🌐 Navigation & Modules</h3>
+    <p id="page-status">Current View: Home</p>
+    <button onclick="switchTab('Exchange Market')">Go to Exchange</button><br><br>
+    <button onclick="switchTab('Gold Rates')">Go to Gold Rates</button>
   </div>
 
   <script>
-    Telegram.WebApp.ready();
+    // Initialize Telegram Web App SDK
+    const tg = window.Telegram.WebApp;
+    tg.expand(); // Make WebApp full height
 
-    // URL မှာပါတဲ့ Parameter အလိုက် Page သီးသန့်ပြပေးခြင်း
-    const urlParams = new URLSearchParams(window.location.search);
-    const page = urlParams.get('page') || 'exchange';
-
-    document.querySelectorAll('.card').forEach(el => el.classList.remove('active'));
-    if (document.getElementById(page)) {
-      document.getElementById(page).classList.add('active');
+    // Display User Data from Telegram Context
+    if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+      const user = tg.initDataUnsafe.user;
+      document.getElementById('user-name').innerText = `${user.first_name} ${user.last_name || ''}`;
+      document.getElementById('user-id').innerText = user.id;
     } else {
-      document.getElementById('exchange').classList.add('active');
+      document.getElementById('user-name').innerText = "Guest (Browser Mode)";
     }
 
-    // Exchange Calculator
-    function convertCurrency() {
-      const thb = document.getElementById('thbAmount').value;
-      const rate = 125; // ဥပမာ Exchange Rate
-      document.getElementById('mmkResult').value = (thb * rate).toLocaleString() + " MMK";
-    }
-
-    // Mini Game Logic
+    // Tap Game Logic with Haptic Feedback
     let score = 0;
-    function catchCoin() {
+    function tapButton() {
       score++;
       document.getElementById('score').innerText = score;
       
-      const box = document.getElementById('game-box');
-      const maxX = box.clientWidth - 40;
-      const maxY = box.clientHeight - 40;
-      
-      const randomX = Math.floor(Math.random() * maxX);
-      const randomY = Math.floor(Math.random() * maxY);
-      
-      const coin = document.getElementById('gold-coin');
-      coin.style.left = randomX + 'px';
-      coin.style.top = randomY + 'px';
+      // Trigger Haptic Feedback on Phone
+      if (tg.HapticFeedback) {
+        tg.HapticFeedback.impactOccurred('medium');
+      }
+    }
+
+    // Tab Switching Logic
+    function switchTab(tabName) {
+      document.getElementById('page-status').innerText = "Current View: " + tabName;
+      if (tg.HapticFeedback) {
+        tg.HapticFeedback.notificationOccurred('success');
+      }
     }
   </script>
 </body>
